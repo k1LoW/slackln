@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -37,7 +38,7 @@ func (c *Client) GetChannelIDByName(ctx context.Context, channel string) (string
 	for {
 		var ch []slack.Channel
 		p := &slack.GetConversationsParameters{
-			Limit:  100,
+			Limit:  1000,
 			Cursor: nc,
 		}
 		ch, nc, err = c.api.GetConversationsContext(ctx, p)
@@ -103,6 +104,9 @@ func (c *Client) GetHistory(ctx context.Context, msgChan chan slack.Msg, channel
 }
 
 func (c *Client) GetUserNameByID(ctx context.Context, uID string) string {
+	if uID == "" {
+		return ""
+	}
 	if u, ok := c.userCache[uID]; ok {
 		return u.Name
 	}
@@ -123,6 +127,22 @@ func (c *Client) HumanizeMessage(ctx context.Context, in string) string {
 	out = subtMentionRe.ReplaceAllString(out, "$1")
 	out = urlRe.ReplaceAllString(out, "$1")
 	return out
+}
+
+func (c *Client) HumanizeTimestamp(in string) string {
+	u := strings.Split(in, ".")
+	if len(u) != 2 {
+		return in
+	}
+	b, err := strconv.Atoi(u[0])
+	if err != nil {
+		return in
+	}
+	a, err := strconv.Atoi(u[1])
+	if err != nil {
+		return in
+	}
+	return time.Unix(int64(b), int64(a)).Format(time.RFC3339Nano)
 }
 
 func detectTimeRangeOfMessage(duration, latest, oldest string) (l, o string, err error) {

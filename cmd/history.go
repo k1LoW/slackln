@@ -72,6 +72,7 @@ var historyCmd = &cobra.Command{
 						m.Attachments[i].Fields[j].Value = c.HumanizeMessage(ctx, f.Value)
 					}
 				}
+				m.Timestamp = c.HumanizeTimestamp(m.Timestamp)
 			}
 			b, err := json.Marshal(m)
 			if err != nil {
