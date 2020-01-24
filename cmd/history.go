@@ -68,6 +68,9 @@ var historyCmd = &cobra.Command{
 				m.Text = c.HumanizeMessage(ctx, m.Text)
 				for i, a := range m.Attachments {
 					m.Attachments[i].Text = c.HumanizeMessage(ctx, a.Text)
+					for j, f := range a.Fields {
+						m.Attachments[i].Fields[j].Value = c.HumanizeMessage(ctx, f.Value)
+					}
 				}
 			}
 			b, err := json.Marshal(m)
