@@ -22,36 +22,68 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"context"
+	"encoding/json"
 	"fmt"
+	"os"
 
+	"github.com/k1LoW/slackln/client"
+	"github.com/nlopes/slack"
 	"github.com/spf13/cobra"
+)
+
+var (
+	channel  string
+	duration string
+	latest   string
+	oldest   string
+	raw      bool
 )
 
 // historyCmd represents the history command
 var historyCmd = &cobra.Command{
 	Use:   "history",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "print channel history",
+	Long:  `print channel history.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("history called")
+		ctx, cancel := context.WithCancel(context.Background())
+		defer cancel()
+		c, err := client.New(os.Getenv("SLACK_TOKEN"))
+		if err != nil {
+			panic(err)
+		}
+
+		msgChan := make(chan slack.Msg)
+
+		go func() {
+			err := c.GetHistory(ctx, msgChan, channel, duration, latest, oldest)
+			if err != nil {
+				_, _ = fmt.Fprintf(os.Stderr, "%s\n", err)
+			}
+		}()
+
+		for m := range msgChan {
+			if !raw {
+				m.User = c.GetUserNameByID(ctx, m.User)
+				m.Text = c.HumanizeMessage(ctx, m.Text)
+				for i, a := range m.Attachments {
+					m.Attachments[i].Text = c.HumanizeMessage(ctx, a.Text)
+				}
+			}
+			b, err := json.Marshal(m)
+			if err != nil {
+				panic(err)
+			}
+			_, _ = fmt.Fprintf(os.Stdout, "%s\n", b)
+		}
 	},
 }
 
 func init() {
 	rootCmd.AddCommand(historyCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// historyCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// historyCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	historyCmd.Flags().StringVarP(&channel, "channel", "c", "", "Slack channel")
+	historyCmd.Flags().StringVarP(&duration, "duration", "", "1day", "duration of time range of messages.")
+	historyCmd.Flags().StringVarP(&latest, "latest", "", "", "end of time range of messages.")
+	historyCmd.Flags().StringVarP(&oldest, "oldest", "", "", "start of time range of messages.")
+	historyCmd.Flags().BoolVarP(&raw, "raw", "", false, "print raw messages.")
 }
