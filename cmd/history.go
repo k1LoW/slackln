@@ -53,7 +53,8 @@ var historyCmd = &cobra.Command{
 		defer cancel()
 		c, err := client.New(os.Getenv("SLACK_TOKEN"))
 		if err != nil {
-			panic(err)
+			_, _ = fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
 		}
 
 		msgChan := make(chan slack.Msg)
