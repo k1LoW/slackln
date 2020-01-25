@@ -26,11 +26,14 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"regexp"
 
 	"github.com/k1LoW/slackln/client"
 	"github.com/nlopes/slack"
 	"github.com/spf13/cobra"
 )
+
+var tsFieldRe = regexp.MustCompile(`"ts":"([0-9.]+)"`)
 
 var (
 	channel  string
@@ -58,7 +61,7 @@ var historyCmd = &cobra.Command{
 		go func() {
 			err := c.GetHistory(ctx, msgChan, channel, duration, latest, oldest)
 			if err != nil {
-				_, _ = fmt.Fprintf(os.Stderr, "%s\n", err)
+				_, _ = fmt.Fprintln(os.Stderr, err)
 			}
 		}()
 
@@ -72,13 +75,22 @@ var historyCmd = &cobra.Command{
 						m.Attachments[i].Fields[j].Value = c.HumanizeMessage(ctx, f.Value)
 					}
 				}
-				m.Timestamp = c.HumanizeTimestamp(m.Timestamp)
 			}
 			b, err := json.Marshal(m)
 			if err != nil {
-				panic(err)
+				_, _ = fmt.Fprintln(os.Stderr, err)
+				os.Exit(1)
 			}
-			_, _ = fmt.Fprintf(os.Stdout, "%s\n", b)
+			s := string(b)
+			if !raw {
+				s = tsFieldRe.ReplaceAllStringFunc(s, func(in string) string {
+					raw := tsFieldRe.ReplaceAllString(in, "$1")
+					t := c.HumanizeTimestamp(raw)
+					out := `"ts":"` + t + `:","ts_raw":"` + raw + `"`
+					return out
+				})
+			}
+			_, _ = fmt.Fprintln(os.Stdout, s)
 		}
 	},
 }
