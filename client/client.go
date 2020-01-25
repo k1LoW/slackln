@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
@@ -18,23 +19,30 @@ var subtMentionRe = regexp.MustCompile(`<\!subteam\^S[0-9A-Z]+\|([^>]+)>`)
 var urlRe = regexp.MustCompile(`<(https?://[^>]+)>`)
 
 type Client struct {
-	api       *slack.Client
-	userCache map[string]*slack.User
+	api          *slack.Client
+	channelCache map[string]*slack.Channel
+	userCache    map[string]*slack.User
+	urlCache     string
 }
 
 func New(token string) (*Client, error) {
 	return &Client{
-		api:       slack.New(token),
-		userCache: make(map[string]*slack.User),
+		api:          slack.New(token),
+		channelCache: make(map[string]*slack.Channel),
+		userCache:    make(map[string]*slack.User),
 	}, nil
 }
 
 func (c *Client) GetChannelIDByName(ctx context.Context, channel string) (string, error) {
+	if cc, ok := c.channelCache[channel]; ok {
+		return cc.ID, nil
+	}
 	var (
-		chs []slack.Channel
 		nc  string
 		err error
+		cID string
 	)
+L:
 	for {
 		var ch []slack.Channel
 		p := &slack.GetConversationsParameters{
@@ -45,19 +53,19 @@ func (c *Client) GetChannelIDByName(ctx context.Context, channel string) (string
 		if err != nil {
 			return "", err
 		}
-		chs = append(chs, ch...)
+		for _, cc := range ch {
+			if cc.Name == channel {
+				cID = cc.ID
+				c.channelCache[channel] = &cc
+				break L
+			}
+		}
 		if nc == "" {
 			break
 		}
 	}
-	var channelID string
-	for _, c := range chs {
-		if c.Name == channel {
-			channelID = c.ID
-			break
-		}
-	}
-	return channelID, nil
+
+	return cID, nil
 }
 
 func (c *Client) GetHistory(ctx context.Context, msgChan chan slack.Msg, channel, duration, latest, oldest string) error {
@@ -228,4 +236,25 @@ func (c *Client) GetPermalink(ctx context.Context, channel, messageTs string) (s
 		return "", err
 	}
 	return l, nil
+}
+
+func (c *Client) CreateParmalink(ctx context.Context, channel, messageTs string) (string, error) {
+	if c.urlCache == "" {
+		l, err := c.GetPermalink(ctx, channel, messageTs)
+		if err != nil {
+			return "", err
+		}
+		c.urlCache = l
+		return l, err
+	}
+	cID, err := c.GetChannelIDByName(ctx, channel)
+	if err != nil {
+		return "", err
+	}
+	u, err := url.Parse(c.urlCache)
+	if err != nil {
+		return "", err
+	}
+	us := u.Scheme + "://" + strings.Join([]string{u.Host, "archives", cID, "p" + strings.Replace(messageTs, ".", "", -1)}, "/")
+	return us, nil
 }

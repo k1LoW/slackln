@@ -86,8 +86,12 @@ var historyCmd = &cobra.Command{
 			if !raw {
 				s = tsFieldRe.ReplaceAllStringFunc(s, func(in string) string {
 					raw := tsFieldRe.ReplaceAllString(in, "$1")
+					pl, err := c.CreateParmalink(ctx, channel, raw)
+					if err != nil {
+						_, _ = fmt.Fprintln(os.Stderr, err)
+					}
 					t := c.HumanizeTimestamp(raw)
-					out := `"ts":"` + t + `:","ts_raw":"` + raw + `"`
+					out := `"ts":"` + t + `:","ts_raw":"` + raw + `","permalink":"` + pl + `"`
 					return out
 				})
 			}
