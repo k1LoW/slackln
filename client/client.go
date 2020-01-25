@@ -213,3 +213,19 @@ func detectTimeRangeOfMessage(duration, latest, oldest string) (l, o string, err
 
 	return l, o, err
 }
+
+func (c *Client) GetPermalink(ctx context.Context, channel, messageTs string) (string, error) {
+	cID, err := c.GetChannelIDByName(ctx, channel)
+	if err != nil {
+		return "", err
+	}
+	p := &slack.PermalinkParameters{
+		Channel: cID,
+		Ts:      messageTs,
+	}
+	l, err := c.api.GetPermalinkContext(ctx, p)
+	if err != nil {
+		return "", err
+	}
+	return l, nil
+}
