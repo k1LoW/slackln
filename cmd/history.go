@@ -91,7 +91,7 @@ var historyCmd = &cobra.Command{
 						_, _ = fmt.Fprintln(os.Stderr, err)
 					}
 					t := c.HumanizeTimestamp(raw)
-					out := `"ts":"` + t + `:","ts_raw":"` + raw + `","permalink":"` + pl + `"`
+					out := `"ts":"` + t + `","ts_raw":"` + raw + `","permalink":"` + pl + `"`
 					return out
 				})
 			}
