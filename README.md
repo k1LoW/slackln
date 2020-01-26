@@ -1,6 +1,6 @@
 # slackln
 
-Print Slack data as JSON Lines
+Println Slack.
 
 ## TODO
 

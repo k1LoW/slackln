@@ -51,7 +51,7 @@ var historyCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
-		c, err := client.New(os.Getenv("SLACK_TOKEN"))
+		c, err := client.New(getToken())
 		if err != nil {
 			_, _ = fmt.Fprintln(os.Stderr, err)
 			os.Exit(1)
