@@ -1,6 +1,6 @@
 # slackln
 
-Println Slack.
+Println(Slack).
 
 ## TODO
 

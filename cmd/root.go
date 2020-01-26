@@ -30,8 +30,8 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:   "slackln",
-	Short: "Println Slack",
-	Long:  `Println Slack.`,
+	Short: "Println(Slack)",
+	Long:  `Println(Slack).`,
 	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
