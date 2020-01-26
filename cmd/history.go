@@ -76,6 +76,11 @@ var historyCmd = &cobra.Command{
 						m.Attachments[i].Fields[j].Value = c.HumanizeMessage(ctx, f.Value)
 					}
 				}
+				for i, r := range m.Reactions {
+					for j, u := range r.Users {
+						m.Reactions[i].Users[j] = c.GetUserNameByID(ctx, u)
+					}
+				}
 			}
 			b, err := json.Marshal(m)
 			if err != nil {
