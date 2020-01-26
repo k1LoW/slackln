@@ -1,4 +1,4 @@
-# slackln
+# slackln [![GitHub release](https://img.shields.io/github/release/k1LoW/slackln.svg)](https://github.com/k1LoW/slackln/releases)
 
 Println(Slack).
 
