@@ -4,5 +4,5 @@ Println Slack.
 
 ## TODO
 
-- [ ] Search messages ( using https://api.slack.com/methods/search.messages )
-- [ ] OAuth server
+- [ ] `slackln search`: Search messages ( using https://api.slack.com/methods/search.messages )
+- [ ] `slackln server`: OAuth server

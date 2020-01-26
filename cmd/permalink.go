@@ -30,9 +30,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
-	messageTs string
-)
+var messageTs string
 
 // permalinkCmd represents the permalink command
 var permalinkCmd = &cobra.Command{
