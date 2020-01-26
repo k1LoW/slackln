@@ -1,0 +1,65 @@
+before:
+  hooks:
+    - go mod download
+    - go mod tidy
+builds:
+-
+  id: slackln-linux
+  env:
+    - CGO_ENABLED=0
+  goos:
+    - linux
+  ldflags:
+    - -s -w -X github.com/k1LoW/slackln.version={{.Version}} -X github.com/k1LoW/slackln.commit={{.FullCommit}} -X github.com/k1LoW/slackln.date={{.Date}} -X github.com/k1LoW/slackln/version.Version={{.Version}}
+-
+  id: slackln-darwin
+  env:
+    - CGO_ENABLED=0
+  goos:
+    - darwin
+  ldflags:
+    - -s -w -X github.com/k1LoW/slackln.version={{.Version}} -X github.com/k1LoW/slackln.commit={{.FullCommit}} -X github.com/k1LoW/slackln.date={{.Date}} -X github.com/k1LoW/slackln/version.Version={{.Version}}
+archives:
+-
+  id: slackln-archive
+  name_template: '{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+  format_overrides:
+    - goos: darwin
+      format: zip
+  files:
+    - CREDITS
+    - README.md
+    - CHANGELOG.md
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ .Version }}-next"
+changelog:
+  skip: true
+brews:
+-
+  name: slackln
+  github:
+    owner: k1LoW
+    name: homebrew-tap
+  commit_author:
+    name: k1LoW
+    email: k1lowxb@gmail.com
+  homepage: https://github.com/k1LoW/slackln
+  description: 'Println(Slack).'
+  install: bin.install 'slackln'
+nfpms:
+  -
+    id: slackln-nfpms
+    name_template: "{{ .ProjectName }}_{{ .Version }}-1_{{ .Arch }}"
+    builds:
+    - slackln-linux
+    homepage: https://github.com/k1LoW/slackln
+    maintainer: Ken'ichiro Oyama <k1lowxb@gmail.com>
+    description: Println(Slack).
+    license: MIT
+    formats:
+      - deb
+      - rpm
+    bindir: /usr/bin
+    epoch: 1
