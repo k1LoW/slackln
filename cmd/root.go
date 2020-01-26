@@ -54,7 +54,7 @@ func getToken() string {
 	}
 	for _, k := range keys {
 		if t := os.Getenv(k); t != "" {
-			return k
+			return t
 		}
 	}
 	return ""
