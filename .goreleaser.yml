@@ -47,7 +47,12 @@ brews:
     email: k1lowxb@gmail.com
   homepage: https://github.com/k1LoW/slackln
   description: 'Println(Slack).'
-  install: bin.install 'slackln'
+  install: |
+    system './slackln', 'completion', 'bash', '--out', 'slackln.bash'
+    system './slackln', 'completion', 'zsh', '--out', 'slackln.zsh'
+    bin.install 'slackln'
+    bash_completion.install 'slackln.bash' => 'slackln'
+    zsh_completion.install 'slackln.zsh' => '_slackln'
 nfpms:
   -
     id: slackln-nfpms
