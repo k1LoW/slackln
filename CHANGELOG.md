@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.2.1](https://github.com/k1LoW/slackln/compare/v0.2.0...v0.2.1) (2020-01-26)
+
+* Fix getToken bug [#2](https://github.com/k1LoW/slackln/pull/2) ([k1LoW](https://github.com/k1LoW))
+
 ## [v0.2.0](https://github.com/k1LoW/slackln/compare/v0.1.0...v0.2.0) (2020-01-26)
 
 * Add completion [#1](https://github.com/k1LoW/slackln/pull/1) ([k1LoW](https://github.com/k1LoW))
