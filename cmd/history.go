@@ -63,6 +63,8 @@ var historyCmd = &cobra.Command{
 			err := c.GetHistory(ctx, msgChan, channel, duration, latest, oldest)
 			if err != nil {
 				_, _ = fmt.Fprintln(os.Stderr, err)
+				cancel()
+				os.Exit(1)
 			}
 		}()
 
@@ -85,6 +87,7 @@ var historyCmd = &cobra.Command{
 			b, err := json.Marshal(m)
 			if err != nil {
 				_, _ = fmt.Fprintln(os.Stderr, err)
+				cancel()
 				os.Exit(1)
 			}
 			s := string(b)
