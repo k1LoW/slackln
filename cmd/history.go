@@ -29,7 +29,7 @@ import (
 	"regexp"
 
 	"github.com/k1LoW/slackln/client"
-	"github.com/nlopes/slack"
+	"github.com/acaloiaro/slack"
 	"github.com/spf13/cobra"
 )
 

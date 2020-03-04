@@ -11,7 +11,7 @@ import (
 
 	"github.com/araddon/dateparse"
 	dur "github.com/k1LoW/duration"
-	"github.com/nlopes/slack"
+	"github.com/acaloiaro/slack"
 )
 
 var uMentionRe = regexp.MustCompile(`<@U[0-9A-Z]+>`)
