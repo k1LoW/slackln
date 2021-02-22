@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/acaloiaro/slack"
 	"github.com/araddon/dateparse"
 	dur "github.com/k1LoW/duration"
-	"github.com/acaloiaro/slack"
 )
 
 var uMentionRe = regexp.MustCompile(`<@U[0-9A-Z]+>`)
@@ -34,6 +34,7 @@ func New(token string) (*Client, error) {
 }
 
 func (c *Client) GetChannelIDByName(ctx context.Context, channel string) (string, error) {
+	channel = strings.TrimPrefix(channel, "#")
 	if cc, ok := c.channelCache[channel]; ok {
 		return cc.ID, nil
 	}
@@ -54,9 +55,9 @@ L:
 			return "", err
 		}
 		for _, cc := range ch {
+			c.channelCache[channel] = &cc
 			if cc.Name == channel {
 				cID = cc.ID
-				c.channelCache[channel] = &cc
 				break L
 			}
 		}

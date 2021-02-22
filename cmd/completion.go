@@ -38,10 +38,10 @@ var completionCmd = &cobra.Command{
 To configure your shell to load completions for each session
 
 # bash
-echo '. <(tbls completion bash)' > ~/.bashrc
+echo '. <(slackln completion bash)' > ~/.bashrc
 
 # zsh
-tbls completion zsh > $fpath[1]/_tbls
+slackln completion zsh > $fpath[1]/_slackln
 `,
 	ValidArgs: []string{"bash", "zsh"},
 	Args: func(cmd *cobra.Command, args []string) error {
