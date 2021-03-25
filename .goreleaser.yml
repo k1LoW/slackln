@@ -3,33 +3,33 @@ before:
     - go mod download
     - go mod tidy
 builds:
--
-  id: slackln-linux
-  env:
-    - CGO_ENABLED=0
-  goos:
-    - linux
-  ldflags:
-    - -s -w -X github.com/k1LoW/slackln.version={{.Version}} -X github.com/k1LoW/slackln.commit={{.FullCommit}} -X github.com/k1LoW/slackln.date={{.Date}} -X github.com/k1LoW/slackln/version.Version={{.Version}}
--
-  id: slackln-darwin
-  env:
-    - CGO_ENABLED=0
-  goos:
-    - darwin
-  ldflags:
-    - -s -w -X github.com/k1LoW/slackln.version={{.Version}} -X github.com/k1LoW/slackln.commit={{.FullCommit}} -X github.com/k1LoW/slackln.date={{.Date}} -X github.com/k1LoW/slackln/version.Version={{.Version}}
+  -
+    id: slackln-linux
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+    ldflags:
+      - -s -w -X github.com/k1LoW/slackln.version={{.Version}} -X github.com/k1LoW/slackln.commit={{.FullCommit}} -X github.com/k1LoW/slackln.date={{.Date}} -X github.com/k1LoW/slackln/version.Version={{.Version}}
+  -
+    id: slackln-darwin
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - darwin
+    ldflags:
+      - -s -w -X github.com/k1LoW/slackln.version={{.Version}} -X github.com/k1LoW/slackln.commit={{.FullCommit}} -X github.com/k1LoW/slackln.date={{.Date}} -X github.com/k1LoW/slackln/version.Version={{.Version}}
 archives:
--
-  id: slackln-archive
-  name_template: '{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
-  format_overrides:
-    - goos: darwin
-      format: zip
-  files:
-    - CREDITS
-    - README.md
-    - CHANGELOG.md
+  -
+    id: slackln-archive
+    name_template: '{{ .ProjectName }}_v{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+    format_overrides:
+      - goos: darwin
+        format: zip
+    files:
+      - CREDITS
+      - README.md
+      - CHANGELOG.md
 checksum:
   name_template: 'checksums.txt'
 snapshot:
@@ -37,26 +37,42 @@ snapshot:
 changelog:
   skip: true
 brews:
--
-  name: slackln
-  github:
-    owner: k1LoW
-    name: homebrew-tap
-  commit_author:
-    name: k1LoW
-    email: k1lowxb@gmail.com
-  homepage: https://github.com/k1LoW/slackln
-  description: 'Println(Slack).'
-  install: |
-    system './slackln', 'completion', 'bash', '--out', 'slackln.bash'
-    system './slackln', 'completion', 'zsh', '--out', 'slackln.zsh'
-    bin.install 'slackln'
-    bash_completion.install 'slackln.bash' => 'slackln'
-    zsh_completion.install 'slackln.zsh' => '_slackln'
+  -
+    name: slackln
+    tap:
+      owner: k1LoW
+      name: homebrew-tap
+    commit_author:
+      name: k1LoW
+      email: k1lowxb@gmail.com
+    homepage: https://github.com/k1LoW/slackln
+    description: 'Println(Slack).'
+    license: MIT
+    install: |
+      system './slackln', 'completion', 'bash', '--out', 'slackln.bash'
+      system './slackln', 'completion', 'zsh', '--out', 'slackln.zsh'
+      bin.install 'slackln'
+      bash_completion.install 'slackln.bash' => 'slackln'
+      zsh_completion.install 'slackln.zsh' => '_slackln'
+dockers:
+  -
+    goos: linux
+    goarch: amd64
+    image_templates:
+      - 'ghcr.io/k1low/slackln:v{{ .Version }}'
+      - 'ghcr.io/k1low/slackln:latest'
+    dockerfile: Dockerfile
+    build_flag_templates:
+      - "--pull"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.name={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Version}}"
+      - "--label=org.opencontainers.image.source=https://github.com/k1LoW/slackln"
 nfpms:
   -
     id: slackln-nfpms
-    name_template: "{{ .ProjectName }}_{{ .Version }}-1_{{ .Arch }}"
+    file_name_template: "{{ .ProjectName }}_{{ .Version }}-1_{{ .Arch }}"
     builds:
     - slackln-linux
     homepage: https://github.com/k1LoW/slackln
@@ -64,6 +80,7 @@ nfpms:
     description: Println(Slack).
     license: MIT
     formats:
+      - apk
       - deb
       - rpm
     bindir: /usr/bin
