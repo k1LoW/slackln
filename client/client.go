@@ -9,9 +9,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/acaloiaro/slack"
 	"github.com/araddon/dateparse"
 	dur "github.com/k1LoW/duration"
+	"github.com/slack-go/slack"
 )
 
 var uMentionRe = regexp.MustCompile(`<@U[0-9A-Z]+>`)
@@ -64,6 +64,10 @@ L:
 		if nc == "" {
 			break
 		}
+	}
+
+	if cID == "" {
+		return "", fmt.Errorf("not found channel: %s", channel)
 	}
 
 	return cID, nil
