@@ -49,6 +49,7 @@ func init() {
 func getToken() string {
 	keys := []string{
 		"SLACKLN_TOKEN",
+		"SLACK_API_TOKEN",
 		"SLACK_OAUTH_TOKEN",
 		"SLACK_TOKEN",
 	}
