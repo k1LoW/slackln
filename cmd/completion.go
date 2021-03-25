@@ -33,8 +33,8 @@ var out string
 // completionCmd represents the completion command
 var completionCmd = &cobra.Command{
 	Use:   "completion",
-	Short: "output shell completion code",
-	Long: `output shell completion code.
+	Short: "Output shell completion code",
+	Long: `Output shell completion code.
 To configure your shell to load completions for each session
 
 # bash
@@ -42,8 +42,11 @@ echo '. <(slackln completion bash)' > ~/.bashrc
 
 # zsh
 slackln completion zsh > $fpath[1]/_slackln
+
+# fish
+slackln completion fish ~/.config/fish/completions/slackln.fish
 `,
-	ValidArgs: []string{"bash", "zsh"},
+	ValidArgs: []string{"bash", "zsh", "fish", "powershell"},
 	Args: func(cmd *cobra.Command, args []string) error {
 		if len(args) != 1 {
 			return fmt.Errorf("accepts 1 arg, received %d", len(args))
@@ -53,7 +56,7 @@ slackln completion zsh > $fpath[1]/_slackln
 		}
 		return nil
 	},
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		var (
 			o   *os.File
 			err error
@@ -64,24 +67,36 @@ slackln completion zsh > $fpath[1]/_slackln
 		} else {
 			o, err = os.Create(out)
 			if err != nil {
-				_, _ = fmt.Fprintf(os.Stderr, "%s\n", err)
-				os.Exit(1)
+				return err
 			}
-			defer o.Close()
 		}
 
 		switch sh {
 		case "bash":
-			if err := rootCmd.GenBashCompletion(o); err != nil {
-				_, _ = fmt.Fprintf(os.Stderr, "%s\n", err)
-				os.Exit(1)
+			if err := cmd.Root().GenBashCompletion(o); err != nil {
+				_ = o.Close()
+				return err
 			}
 		case "zsh":
-			if err := rootCmd.GenZshCompletion(o); err != nil {
-				_, _ = fmt.Fprintf(os.Stderr, "%s\n", err)
-				os.Exit(1)
+			if err := cmd.Root().GenZshCompletion(o); err != nil {
+				_ = o.Close()
+				return err
+			}
+		case "fish":
+			if err := cmd.Root().GenFishCompletion(o, true); err != nil {
+				_ = o.Close()
+				return err
+			}
+		case "powershell":
+			if err := cmd.Root().GenPowerShellCompletion(o); err != nil {
+				_ = o.Close()
+				return err
 			}
 		}
+		if err := o.Close(); err != nil {
+			return err
+		}
+		return nil
 	},
 }
 

@@ -22,7 +22,6 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -32,12 +31,12 @@ var rootCmd = &cobra.Command{
 	Use:   "slackln",
 	Short: "Println(Slack)",
 	Long:  `Println(Slack).`,
-	//	Run: func(cmd *cobra.Command, args []string) { },
 }
 
 func Execute() {
+	rootCmd.SetOut(os.Stdout)
+	rootCmd.SetErr(os.Stderr)
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
 		os.Exit(1)
 	}
 }

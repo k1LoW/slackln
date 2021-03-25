@@ -24,7 +24,6 @@ package cmd
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"os"
 	"regexp"
 
@@ -48,13 +47,12 @@ var historyCmd = &cobra.Command{
 	Use:   "history",
 	Short: "print channel history",
 	Long:  `print channel history.`,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 		c, err := client.New(getToken())
 		if err != nil {
-			_, _ = fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
+			return err
 		}
 
 		msgChan := make(chan slack.Msg)
@@ -62,7 +60,7 @@ var historyCmd = &cobra.Command{
 		go func() {
 			err := c.GetHistory(ctx, msgChan, channel, duration, latest, oldest)
 			if err != nil {
-				_, _ = fmt.Fprintln(os.Stderr, err)
+				cmd.PrintErrln(err)
 				cancel()
 				os.Exit(1)
 			}
@@ -86,9 +84,8 @@ var historyCmd = &cobra.Command{
 			}
 			b, err := json.Marshal(m)
 			if err != nil {
-				_, _ = fmt.Fprintln(os.Stderr, err)
 				cancel()
-				os.Exit(1)
+				return err
 			}
 			s := string(b)
 			if !raw {
@@ -96,15 +93,16 @@ var historyCmd = &cobra.Command{
 					raw := tsFieldRe.ReplaceAllString(in, "$1")
 					pl, err := c.CreateParmalink(ctx, channel, raw)
 					if err != nil {
-						_, _ = fmt.Fprintln(os.Stderr, err)
+						cmd.PrintErrln(err)
 					}
 					t := c.HumanizeTimestamp(raw)
 					out := `"ts":"` + t + `","ts_raw":"` + raw + `","permalink":"` + pl + `"`
 					return out
 				})
 			}
-			_, _ = fmt.Fprintln(os.Stdout, s)
+			cmd.Println(s)
 		}
+		return nil
 	},
 }
 

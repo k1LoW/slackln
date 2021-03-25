@@ -23,8 +23,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
-	"os"
 
 	"github.com/k1LoW/slackln/client"
 	"github.com/spf13/cobra"
@@ -37,20 +35,19 @@ var permalinkCmd = &cobra.Command{
 	Use:   "permalink",
 	Short: "print permalink URL of message",
 	Long:  `print permalink URL of message.`,
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 		c, err := client.New(getToken())
 		if err != nil {
-			_, _ = fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
+			return err
 		}
 		l, err := c.GetPermalink(ctx, channel, messageTs)
 		if err != nil {
-			_, _ = fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
+			return err
 		}
-		_, _ = fmt.Fprintln(os.Stdout, l)
+		cmd.Println(l)
+		return nil
 	},
 }
 
