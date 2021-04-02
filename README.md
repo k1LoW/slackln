@@ -27,8 +27,3 @@ Download binany from [releases page](https://github.com/k1LoW/slackln/releases)
 ```console
 $ go get github.com/k1LoW/slackln
 ```
-
-## TODO
-
-- [ ] `slackln search`: Search messages ( using https://api.slack.com/methods/search.messages )
-- [ ] `slackln server`: OAuth server
