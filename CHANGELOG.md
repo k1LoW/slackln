@@ -1,5 +1,9 @@
 # Changelog
 
+## [v0.3.1](https://github.com/k1LoW/slackln/compare/v0.3.0...v0.3.1) (2022-02-09)
+
+* Support darwin arm64 [#6](https://github.com/k1LoW/slackln/pull/6) ([k1LoW](https://github.com/k1LoW))
+
 ## [v0.3.0](https://github.com/k1LoW/slackln/compare/v0.2.3...v0.3.0) (2021-03-26)
 
 * Update pkg [#5](https://github.com/k1LoW/slackln/pull/5) ([k1LoW](https://github.com/k1LoW))
